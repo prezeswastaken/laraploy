@@ -1,5 +1,5 @@
 # Main Laravel app
-{{DOMAIN}}, www.{{DOMAIN}}
+{{DOMAIN}}, www.{{DOMAIN}} {
     root * {{LARAVEL_PROJECT_PATH}}
     encode gzip
     php_fastcgi unix//run/php/php8.3-fpm.sock

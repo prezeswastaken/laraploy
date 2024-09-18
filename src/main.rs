@@ -1,6 +1,6 @@
 use std::process::{Child, Command, Stdio};
 
-const LARAVEL_PROJECT_PATH: &str = "/home/prezes/Code/rust/laraploy";
+const LARAVEL_PROJECT_PATH: &str = "/var/www/laravel";
 
 const CADDY_FILE_PATH: &str = "/etc/caddy/Caddyfile";
 const CADDY_FILE_TEMPLATE: &str = include_str!("../templates/Caddyfile");
@@ -77,7 +77,7 @@ fn install_dependencies() -> anyhow::Result<Child> {
         .arg("-c")
         .arg(command)
         .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
+        .stderr(Stdio::piped())
         .spawn()
         .map_err(|_| anyhow::anyhow!("Error while installing PHP extensions!"))?;
 
@@ -91,7 +91,7 @@ fn configure_laravel_things() -> anyhow::Result<Child> {
         .arg("-c")
         .arg(command)
         .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
+        .stderr(Stdio::piped())
         .spawn()
         .map_err(|_| anyhow::anyhow!("Error while configuring Laravel!"))?;
 
@@ -99,12 +99,17 @@ fn configure_laravel_things() -> anyhow::Result<Child> {
 }
 
 fn clone_project(repo_url: String) -> anyhow::Result<Child> {
-    let command = format!("git clone {repo_url} {LARAVEL_PROJECT_PATH}");
+    let clone_path = LARAVEL_PROJECT_PATH.split('/')
+        .take(LARAVEL_PROJECT_PATH.split('/').count() - 1)
+        .collect::<Vec<&str>>()
+        .join("/");
+
+    let command = format!("cd {clone_path} && cd .. && git clone {repo_url} laravel");
     let child = Command::new("sh")
         .arg("-c")
         .arg(command)
         .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
+        .stderr(Stdio::piped())
         .spawn()
         .map_err(|_| anyhow::anyhow!("Error while cloning the repository!"))?;
 
@@ -136,13 +141,13 @@ fn main() -> anyhow::Result<()> {
         .iter()
         .find(|(key, _)| key == "REVERB_PORT")
         .map(|(_, value)| value)
-        .unwrap_or(&"9001".to_string()).to_string();
+        .unwrap_or(&"8001".to_string()).to_string();
 
     let reverb_server_port = env_values
         .iter()
         .find(|(key, _)| key == "REVERB_SERVER_PORT")
         .map(|(_, value)| value)
-        .unwrap_or(&"9002".to_string()).to_string();
+        .unwrap_or(&"8002".to_string()).to_string();
 
     println!("Waiting for all dependencies to be installed...");
     handle.wait()?;
