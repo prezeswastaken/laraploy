@@ -1,0 +1,12 @@
+# Main Laravel app
+{{DOMAIN}}, www.{{DOMAIN}}
+    root * {{LARAVEL_PROJECT_PATH}}
+    encode gzip
+    php_fastcgi unix//run/php/php8.3-fpm.sock
+    file_server
+}
+
+# Reverse proxy for reverb
+{{DOMAIN}}:{{REVERB_PORT}}, www.{{DOMAIN}}:{{REVERB_PORT}} {
+    reverse_proxy localhost:{{REVERB_SERVER_PORT}}
+}
