@@ -16,7 +16,7 @@ jobs:
       - name: Set up Rust
         uses: actions/setup-rust@v1
         with:
-          rust-version: 1.80 # Specify the Rust version you want to use
+          rust-version: 1.70 # Specify the Rust version you want to use
 
       - name: Build project
         run: cargo build --release
